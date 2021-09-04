@@ -1,5 +1,5 @@
 import React from "react";
-import { Text,View, StyleSheet,Switch } from "react-native";
+import { Text,View, StyleSheet,Switch,ScrollView } from "react-native";
 import TextBox from "../components/textbox";
 import { Button } from 'react-native-paper';
 import MyButton from "../components/button";
@@ -7,11 +7,26 @@ import Logo from "../components/logo";
 import { TextInput } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 
+import "firebase/auth";
+import "firebase/firestore";
+import "firebase/database";
+
+///Google SignIn
+import {
+    GoogleSignin,
+    GoogleSigninButton,
+    statusCodes,
+  } from '@react-native-google-signin/google-signin';
+ 
 
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref,set  } from "firebase/database";
+import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
+GoogleSignin.configure({
+    webClientId: '863114081187-k3vtutk2n2ju8tl6tcske1fkdhbh078g.apps.googleusercontent.com',
+  });
 class Login extends React.Component{
 
 
@@ -64,7 +79,8 @@ componentDidMount(){
           };
 
         return(
-            <View style={{backgroundColor:'white'}}>
+            
+            <ScrollView scrollEnabled={true} style={{backgroundColor:'white'}}>
                 <View style={styles.logo}>
                     <Logo/>
                 </View>
@@ -92,14 +108,25 @@ componentDidMount(){
                             name={this.state.showPassword ? 'eye-off':'eye'}
                             onPress={this.toggleSwitch} />} />
                 
-                        <   MyButton label="Sign In" onPress={this.login} />
+                        <MyButton label="Sign In" onPress={this.login} />
                             <View style={styles.option1}>
-                                <Text>Don't you have an account?  </Text> 
-                                <Text style={styles.option2} onPress={this.signup}>Sign Up</Text>
+                                <Text>Don't you have an account? <Text style={styles.option2} onPress={this.signup}>Sign Up</Text>  </Text> 
+                               
+                              
                             </View>
+
+                           <View style={{ justifyContent: 'center',alignItems: 'center'}}>
+                           <GoogleSigninButton
+                             style={{width:200, height: 48 }}
+                            size={GoogleSigninButton.Size.Wide}
+                            color={GoogleSigninButton.Color.Dark}
+                            onPress={this.signIn2}
+                            disabled={this.state.isSigninInProgress} />
+                               </View>
+                           
                     </View>
                 </View>
-            </View>
+            </ScrollView>
         );
     }
 
@@ -109,6 +136,49 @@ componentDidMount(){
         this.setState({ showPassword: !this.state.showPassword });
         
       }
+
+
+      signIn2 = async () =>  {
+      
+        await GoogleSignin.hasPlayServices();
+        const userInfo = await GoogleSignin.signIn();
+        this.setState({ userInfo});
+      
+      
+      
+        const googleCredential = GoogleAuthProvider.credential(userInfo.idToken)
+        console.log(googleCredential);
+        const auth = getAuth();
+        
+        console.log(auth);
+        
+        const {navigate} = this.props.navigation; 
+        navigate("Home");
+      }
+      signIn = async () => {
+        try {
+            // add any configuration settings here:
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      this.setState({ userInfo: userInfo, loggedIn: true });
+      // create a new firebase credential with the token
+      const auth = getAuth();
+      const credential = GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
+      //const credential = firebase.auth.GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
+      // login with credential
+      await signInWithCredential(credential)
+          } catch (error) {
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+              // user cancelled the login flow
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+              // operation (e.g. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+              // play services not available or outdated
+            } else {
+              // some other error happened
+            }
+          }
+      };
 
     login(){
         //For Navigate
@@ -186,6 +256,7 @@ const styles = StyleSheet.create({
     container:{
         margin:40,
         textAlign:'center',
+        
     },
     logo:{
         justifyContent: 'center',
@@ -193,10 +264,9 @@ const styles = StyleSheet.create({
     },
     option1:{
         alignItems:'center',
-        paddingTop:20, 
+        paddingTop:20,
         textAlign:'center',
         padding:10,
-        flexDirection:'row'
         
     },
     option2:{
