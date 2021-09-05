@@ -82,7 +82,7 @@ componentDidMount(){
             
             <ScrollView scrollEnabled={true} style={{backgroundColor:'white'}}>
                 <View style={styles.logo}>
-                    <Logo/>
+                    <Logo name="Sign In"/>
                 </View>
             
                 <View style={{backgroundColor:'#f0f0f5',borderTopLeftRadius:50,borderTopRightRadius:50}}>
@@ -144,41 +144,47 @@ componentDidMount(){
         const userInfo = await GoogleSignin.signIn();
         this.setState({ userInfo});
       
-      
-      
+        let name =userInfo.user.name;
+        let email = userInfo.user.email;
+        const db  = getDatabase();
+        set(ref(db, 'member/' + userInfo.user.id), {
+            name: name,
+            email: email,
+           
+          });
         const googleCredential = GoogleAuthProvider.credential(userInfo.idToken)
         console.log(googleCredential);
         const auth = getAuth();
         
-        console.log(auth);
+        console.log(userInfo.user.name);
         
         const {navigate} = this.props.navigation; 
         navigate("Home");
       }
-      signIn = async () => {
-        try {
-            // add any configuration settings here:
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      this.setState({ userInfo: userInfo, loggedIn: true });
-      // create a new firebase credential with the token
-      const auth = getAuth();
-      const credential = GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
-      //const credential = firebase.auth.GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
-      // login with credential
-      await signInWithCredential(credential)
-          } catch (error) {
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-              // user cancelled the login flow
-            } else if (error.code === statusCodes.IN_PROGRESS) {
-              // operation (e.g. sign in) is in progress already
-            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-              // play services not available or outdated
-            } else {
-              // some other error happened
-            }
-          }
-      };
+    //   signIn = async () => {
+    //     try {
+    //   await GoogleSignin.hasPlayServices();
+    //   const userInfo = await GoogleSignin.signIn();
+    //   this.setState({ userInfo: userInfo, loggedIn: true });
+ 
+    //   const auth = getAuth();
+    //   const credential = GoogleAuthProvider.credential(userInfo.idToken, userInfo.accessToken)
+      
+    //   await signInWithCredential(credential)
+    //   const {navigate} = this.props.navigation; 
+    //   navigate("Home");
+    //       } catch (error) {
+    //         if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+    //           // user cancelled the login flow
+    //         } else if (error.code === statusCodes.IN_PROGRESS) {
+    //           // operation (e.g. sign in) is in progress already
+    //         } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+    //           // play services not available or outdated
+    //         } else {
+    //           // some other error happened
+    //         }
+    //       }
+    //   };
 
     login(){
         //For Navigate

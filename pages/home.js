@@ -26,8 +26,9 @@ class Home extends React.Component{
             <View>
                 <Appbar.Header style={{backgroundColor:'#536DFE'}}>
                 <Appbar.Content title="" subtitle="" />
+              
+                <Appbar.Action icon="bell"  onPress={this.getCurrentUser} />
                 <Appbar.Action icon="logout"  onPress={this.signOut} />
-                <Appbar.Action icon="login"  onPress={this.getCurrentUser} />
                 </Appbar.Header>
                
             </View>

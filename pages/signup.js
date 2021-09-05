@@ -81,7 +81,7 @@ class Signup extends React.Component{
             <ScrollView scrollEnabled={true} style={{backgroundColor:'white'}} >
            
                 <View style={styles.logo}>
-                    <Logo/>
+                    <Logo name="Sign Up"/>
                 </View>
 
                 <View style={{backgroundColor:'#f0f0f5',borderTopLeftRadius:50,borderTopRightRadius:50}}>
@@ -117,7 +117,7 @@ class Signup extends React.Component{
                     secureTextEntry={this.state.showPassword}
                     onChangeText={(text) => this.setState({ password :text })}
                     right={<TextInput.Icon 
-                    name={this.state.showPassword ? 'eye-off':'eye'}
+                    name={this.state.showPassword ? 'eye':'eye-off'}
                     onPress={this.toggleSwitchPassword} />} 
                      //Error validation
                      helper="Password must contain at least 6 characters"
@@ -132,7 +132,7 @@ class Signup extends React.Component{
                     secureTextEntry={this.state.showConformPassword}
                     onChangeText={(text) => this.setState({ conformPassword :text })}
                     right={<TextInput.Icon 
-                    name={this.state.showConformPassword ? 'eye-off':'eye'}
+                    name={this.state.showConformPassword ? 'eye':'eye-off'}
                     onPress={this.toggleSwitchConformPassword} />} 
                      //Error validation
                      helper="Password  match"
